@@ -9,34 +9,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Клонируем репозиторий
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # 2. Устанавливаем Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
+      # 3. Устанавливаем зависимости
       - name: Install dependencies
         run: npm install
 
+      # 4. Сборка Next.js
       - name: Build Next.js project
         run: npm run build
 
+      # 5. Копируем веб-ассеты в Android
       - name: Copy web assets to Android
         run: npx cap copy android
 
+      # 6. Sync Capacitor Android (создаст необходимые файлы для Cordova плагинов)
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      # 7. Устанавливаем JDK
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # 8. Делаем gradlew исполняемым
       - name: Make gradlew executable
         working-directory: android
         run: chmod +x ./gradlew
 
-      # Сборка Debug APK (для теста)
+      # 9. Сборка Debug APK (для теста)
       - name: Build Debug APK
         working-directory: android
         run: ./gradlew assembleDebug
@@ -47,7 +58,7 @@ jobs:
           name: app-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      # Сборка Release APK
+      # 10. Сборка Release APK
       - name: Build Release APK
         working-directory: android
         run: ./gradlew assembleRelease
